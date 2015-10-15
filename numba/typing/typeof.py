@@ -103,7 +103,16 @@ def _typeof_numpy_scalar(val, c):
 
 @typeof_impl.register(str)
 def _typeof_str(val, c):
-    return types.string
+    # TODO: Need support for 16 bit and 32 bit for Python 2 vs Python 3 differences.
+    nbits = 8
+    if nbits == 8:
+        return types.str8
+    elif nbits == 16:
+        return types.str16
+    elif nbits == 32:
+        return types.str32
+    else:
+        raise NotImplementedError("PEP 393 allows only 1, 2 or 4 byte sized strings")
 
 @typeof_impl.register(type(None))
 def _typeof_none(val, c):

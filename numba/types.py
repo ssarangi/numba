@@ -67,6 +67,23 @@ class Float(Number):
 
 
 @utils.total_ordering
+class String(Number):
+    def __init__(self, *args, **kws):
+        super(String, self).__init__(*args, **kws)
+        # Determine bit width
+        assert self.name.startswith('str')
+        bitwidth = int(self.name[3:])
+        self.bitwidth = bitwidth
+
+    def cast_python_value(self, value):
+        return getattr(numpy, self.name)(value)
+
+    def __lt__(self, other):
+        if self.__class__ is not other.__class__:
+            return NotImplemented
+        return self.bitwidth < other.bitwidth
+
+@utils.total_ordering
 class Complex(Number):
     def __init__(self, name, underlying_float, **kwargs):
         super(Complex, self).__init__(name, **kwargs)
@@ -1425,6 +1442,10 @@ uintc = uint32 if struct.calcsize('i') == 4 else uint64
 float32 = Float('float32')
 float64 = Float('float64')
 
+str8 = String('str8')
+str16 = String('str16')
+str32 = String('str32')
+
 complex64 = Complex('complex64', float32)
 complex128 = Complex('complex128', float64)
 
@@ -1540,6 +1561,9 @@ uintc
 boolean
 float32
 float64
+str8
+str16
+str32
 complex64
 complex128
 bool_
